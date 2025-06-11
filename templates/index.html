@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kelime Telaffuz Geliştirme</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>Kelime Telaffuz Geliştirme</h1>
+
+<div class="container">
+
+    <!-- 1. Kart: Sesli Arama ve Dinleme -->
+    <div class="card">
+        <h2>Sesli Arama & Dinleme</h2>
+
+        <label for="word-input">Kelime:</label>
+        <input type="text" id="word-input" name="word" placeholder="        " autocomplete="off" required />
+
+        <button id="start-voice-search">🎤 Sesli Arama Başlat</button>
+        <button id="play-pronunciation-btn" disabled>Doğru Telaffuzu Dinle</button>
+        <audio id="pronunciation-audio" style="display:none;"></audio>
+    </div>
+
+    <!-- 2. Kart: Ses Kaydı ve Yükleme -->
+    <div class="card">
+        <h2>Ses Kaydı & Yükleme</h2>
+
+        <label for="record-word-input">Kelime (Kayıt için):</label>
+        <input type="text" id="record-word-input" name="record_word" placeholder="Kelimeyi yazınız" autocomplete="off" required />
+
+        <button id="start-record-btn">🎙️ Kayıt Başlat</button>
+        <button id="stop-record-btn" disabled>⏹️ Kayıt Durdur</button>
+
+        <div id="recorded-word" style="margin-top:10px; font-weight:bold; min-height: 1.2em;"></div>
+
+        <audio id="recorded-audio" controls style="display:none;"></audio>
+
+        <button id="upload-recording-btn" disabled>Yükle</button>
+
+        <form id="manual-upload-form" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" style="margin-top: 20px; width: 100%;">
+            <input type="hidden" id="manual-word-hidden" name="word" />
+            <input type="file" name="audio" accept="audio/*" required style="width: 100%; margin-bottom: 10px;"/>
+            <button type="submit" style="width: 100%;">Manuel Yükle</button>
+        </form>
+    </div>
+
+    <!-- 3. Kart: Kaydedilmiş Sesler -->
+    <div class="card">
+        <h2>Kaydedilmiş Sesler</h2>
+        {% if records %}
+            <ul>
+            {% for word, filename in records.items() %}
+                <li id="record-{{ word }}">
+                    <span style="flex-grow:1;">{{ word }}</span>
+                    <audio controls>
+                        <source src="{{ url_for('uploaded_file', filename=filename) }}">
+                        Tarayıcınız audio elementini desteklemiyor.
+                    </audio>
+                    <button class="delete-audio-btn" data-word="{{ word }}" data-filename="{{ filename }}">Sil</button>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>Henüz yüklenmiş ses kaydı yok.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
